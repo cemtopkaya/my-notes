@@ -17,6 +17,40 @@ Eğer ki 4 HOP arasında aşağıdaki gibi dönüp dolaşarak hedefe ulaşamaz v
 
 TTL ile aynı mantıkta bu kez her HOP geçtiğinde 1 arttırıyoruz. Eğer geçilebilecek en çok HOP noktasını geçmişsek paket yine Hakkın rahmetine kavuşturulur.
 
-Kaynak: [Lim Jet Wee](https://www.youtube.com/watch?v=KEQcWP6bXds)
 
-[Ağ dersleri verdiği bu çalma listesi de güzel](https://www.youtube.com/watch?v=U2HwVlROQ1I&list=PLrHVSJmDPvloic8M6wi3VhtE-fhoSngd6)
+# tracert Uygulaması
+
+- TRACERT tanılama yardımcı programı, hedefe İnternet Kontrol Mesaj Protokolü (ICMP) yankı paketleri göndererek bir hedefe giden yolu belirler. 
+- Bu paketlerde TRACERT, değişen IP Yaşam Süresi (TTL) değerleri kullanır. Yol boyunca her yönlendiricinin paketi iletmeden önce paketin TTL'sini en az 1 azaltması gerektiğinden, TTL etkin bir şekilde bir atlama sayacıdır. 
+- Bir paket üzerindeki TTL sıfıra (0) ulaştığında, yönlendirici kaynak bilgisayara bir ICMP "Zaman Aşıldı" mesajı gönderir. 
+- TRACERT, TTL'si 1 olan ilk yankı paketini gönderir ve hedef yanıt verene veya maksimum TTL'ye ulaşılana kadar sonraki her iletimde TTL'yi 1 artırır. 
+- Ara yönlendiricilerin geri gönderdiği ICMP "Süre Aşıldı" mesajları rotayı gösterir. 
+- Ancak bazı yönlendiricilerin, süresi dolmuş TTL'leri olan paketleri sessizce bıraktığını ve bu paketlerin TRACERT tarafından görülmediğini unutmayın. 
+- TRACERT, ICMP "Zaman Aşıldı" mesajlarını döndüren ara yönlendiricilerin sıralı bir listesini yazdırır. 
+- `-d` seçeneğini tracert komutuyla kullanmak, TRACERT'e her IP adresinde bir DNS araması yapmamasını söyler, böylece TRACERT yönlendiricilerin yakın arabiriminin IP adresini bildirir.
+
+```bash
+tracert -d -h maximum_hops -j host-list -w timeout target_host
+```
+
+-d               : Specifies to not resolve addresses to host names
+
+-h maximum_hops  : Specifies the maximum number of hops to search for the target
+
+-j host-list     : Specifies loose source route along the host-list
+
+-w timeout       : Waits the number of milliseconds specified by timeout for each reply
+
+target_host      : Specifies the name or IP address of the target host
+
+
+![image](https://user-images.githubusercontent.com/261946/146691202-6893eab1-55bf-49f3-b636-e21b00700330.png)
+
+![image](https://user-images.githubusercontent.com/261946/146691385-97b9070b-3037-4ca1-8958-078b0ffe9c6a.png)
+
+
+#### Kaynaklar
+- [Lim Jet Wee](https://www.youtube.com/watch?v=KEQcWP6bXds)
+- [Tracert](https://support.microsoft.com/en-us/topic/how-to-use-tracert-to-troubleshoot-tcp-ip-problems-in-windows-e643d72b-2f4f-cdd6-09a0-fd2989c7ca8e)
+- [Ağ dersleri verdiği bu çalma listesi de güzel](https://www.youtube.com/watch?v=U2HwVlROQ1I&list=PLrHVSJmDPvloic8M6wi3VhtE-fhoSngd6)
+- [vTrace Uygulamasının demosu](https://www.youtube.com/watch?v=9Du5VPMoeO8&list=PLrHVSJmDPvloic8M6wi3VhtE-fhoSngd6&index=16)

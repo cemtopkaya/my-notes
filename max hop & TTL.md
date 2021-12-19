@@ -48,9 +48,22 @@ target_host      : Specifies the name or IP address of the target host
 
 ![image](https://user-images.githubusercontent.com/261946/146691385-97b9070b-3037-4ca1-8958-078b0ffe9c6a.png)
 
+## tracert vs ping 
+PING karşıdaki makinanın aktif ve bağlantı kurulup kurulamayacağını söyler. Tracert ise hoplar arasında geçişi gösterir. Yukarıdaki açıklamada ICMP paketinin tracert komutuyla ilişkili olan kısmını okuyabiliriz. İkisinin çıktısını, özellikle ICMP'nin TTL değerlerini okuyabilmek adına güzel bir gösterim:
+
+![image](https://user-images.githubusercontent.com/261946/146693408-45e6c29c-fd6e-43ed-8921-8583b4ddb3c2.png)
+
+Eğer TTL süresini girmezsek TTL=54 içinde hedefe varabiliyor.
+Ancak `ping -i 10 www.opensuse.org` komutuyla gittiğimizde hedefe varacak kadar TTL değeri kalmadığından hedefin bir önceki HOP noktasında paket düşürülüyor.
+Şimdi `-ì 7` değeri için bakalım:
+
+![image](https://user-images.githubusercontent.com/261946/146693515-8f094d5a-f44a-4c7a-ad4b-7ef94e42b9ce.png)
+
+
 
 #### Kaynaklar
 - [Lim Jet Wee](https://www.youtube.com/watch?v=KEQcWP6bXds)
+- [ping vs tracert](https://www.youtube.com/watch?v=g7emt39_OP8&list=PLrHVSJmDPvloic8M6wi3VhtE-fhoSngd6&index=105)
 - [Tracert](https://support.microsoft.com/en-us/topic/how-to-use-tracert-to-troubleshoot-tcp-ip-problems-in-windows-e643d72b-2f4f-cdd6-09a0-fd2989c7ca8e)
 - [Ağ dersleri verdiği bu çalma listesi de güzel](https://www.youtube.com/watch?v=U2HwVlROQ1I&list=PLrHVSJmDPvloic8M6wi3VhtE-fhoSngd6)
 - [vTrace Uygulamasının demosu](https://www.youtube.com/watch?v=9Du5VPMoeO8&list=PLrHVSJmDPvloic8M6wi3VhtE-fhoSngd6&index=16)

@@ -18,13 +18,46 @@ Network Destination        Netmask          Gateway       Interface  Metric
           0.0.0.0          0.0.0.0      192.168.1.1     192.168.1.34     35
 # 0.0.0.0 Netmask adresiyle hedeflenen IP adresine 0.0.0.0 yani CIDR gösterimiyle 0.0.0.0/0 adresine gitmek için
 # 192.168.1.34 ağ arayüzünden erişilebilen 192.168.1.1 geçidine gideceğiz. 
-# Başka bir deyişle; herhangi bir adrese (0.0.0.0/0) gitmek için ADSL modemine uğramam gerekecek. 
-# Modeme ulaşmak için 192.168.1.34 IP'sinin tanımlı olduğu ağ cihazına uğrayacağım. 
+# Yani ADSL Modeme (192.168.1.1) ulaşmak için 192.168.1.34 IP'sinin tanımlı olduğu ağ cihazına uğrayacağım. 
+#
+# Başka bir okumayla; herhangi bir adrese (0.0.0.0/0) gitmek için ADSL modemimin MAC adresini kullanacağım.
+# Yani X.X.X.X IP adresi için Data katmanında MAC adresi olarak 192.168.1.1 ağ geçidinin MAC adresini yazacağım.
+#
+# Örnek AKIŞ'ım ICMP paketiyle olsun: ping 85.86.87.88
+# Hedef IP adresi için rota tablomdaki ilk satırı (0.0.0.0/0) kullanabiliyorum.
+# ARP tablomda 192.168.1.1 makinasının MAC adresi yoksa önce bir ARP mesajı oluşturup ADSL Modeme doğru 192.168.1.34 ağ 
+# arayüzünden göndereceğim:
+#
+# Network Katmanı PAKETİ:
+# Source IP      Destination IP     TTL    Other           Protocol
+# 192.168.1.34   85.86.87.88        128    Diğer bilgiler  ICMP
+#
+# Ama Data Katmanı PAKETİ'nde hedef IP'nin MAC adresi ADSL MODEM olmalı, ancak ARP Tablosunda bu bilgi YOK!
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# ???????????????    D0-C6-37-C4-90-BE  IPv4               [192.168.1.34   85.86.87.88        128    Diğer bilgiler  ICMP]
+#
+# O zaman önce ARP paketi göndereceğiz:
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# FF:FF:FF:FF:FF     D0-C6-37-C4-90-BE  ARP                Who has 192.168.1.1?
+#
+# Gelen ARP REPLY mesajı aşağıdaki gibi olup bu kez ICMP paketi gönderilecek: 
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# D0-C6-37-C4-90-BE  CC:DE:12:F3:A1     ARP                CC:DE:12:F3:A1
+#
+# Gelen mesajın içinden 192.168.1.1 IP'li ADSL modemin MAC adresi alınıp ICMP paketinde DESTINATION MAC kısmına yazılır:
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# CC:DE:12:F3:A1     D0-C6-37-C4-90-BE  IPv4               [192.168.1.34   85.86.87.88        128    Diğer bilgiler  ICMP]
+
           
        23.23.23.0    255.255.255.0         On-link       23.23.23.23    281
 # Bilgisayarımda bir loopback kartı tanımlı ve adresini 23.23.23.23 vermişim. Ve bu kartın dahil olduğu ağdaki bilgisayarlara
 # erişmek için bu 23.23.23.23 IP adresli ağ kartına gitmeliyim.
-# İlk kez gördüğümüz On-Link ifadesi "arada kimse yok, doğrudan kartın bağlı olduğu ağ" anlamındadır.
+# İlk kez gördüğümüz On-Link ifadesi 
+# - arada kimse yok, 
+# - doğrudan kartın bağlı olduğu ağ benim bilgisayarım, 
+# - benim bilgisayar 23.23.23.0-255 bloğuna doğrudan ARP mesajları gönderebilir
+# anlamlarıdadır.
+#
 # Yine 0.0.0.0/0 adresi nasıl uçsuz bucaksız bir ağ tanımı yapıyorsa bu satırdaki 255.255.255.0 maskesi ise o kadar kısıtlayarak
 # sadece 23.23.23.0 ile 23.23.23.255 arasındaki bilisayarları işaret ediyor.
 

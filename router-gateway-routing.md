@@ -29,9 +29,9 @@ Network Destination        Netmask          Gateway       Interface  Metric
 # sadece 23.23.23.0 ile 23.23.23.255 arasındaki bilisayarları işaret ediyor.
 
       23.23.23.23  255.255.255.255         On-link       23.23.23.23    281
-# Bu kez tek bir IP adresini işaretlediğimiz 255.255.255.255 maskesini görüyoruz. Sadece 23.23.23.23 IP'li bilgisayara erişmek için
-# maskemizi 255.255.255.255 diye belirtiyoruz. CIDR olarak yazarsak 23.23.23.23/32 olacak adrese 23.23.23.23 IP'li ağ kartımız üstünden
-# erişebiliyoruz ve yine arada bir başka bir geçit olmadığını On-Link ile ifade ediyor.
+# Bu kez tek bir IP adresini işaretlediğimiz 255.255.255.255 maskesini görüyoruz. Sadece 23.23.23.23 IP'li bilgisayara erişmek 
+# için maskemizi 255.255.255.255 diye belirtiyoruz. CIDR olarak yazarsak 23.23.23.23/32 olacak adrese 23.23.23.23 IP'li ağ kartımız 
+# üstünden erişebiliyoruz ve yine arada bir başka bir geçit olmadığını On-Link ile ifade ediyor.
 
      23.23.23.255  255.255.255.255         On-link       23.23.23.23    281
         127.0.0.0        255.0.0.0         On-link         127.0.0.1    331
@@ -57,8 +57,8 @@ Network Destination        Netmask          Gateway       Interface  Metric
      172.21.112.1  255.255.255.255         On-link      172.21.112.1    271
    172.21.127.255  255.255.255.255         On-link      172.21.112.1    271
 
-# Bu kez internet üstündeki bir bilgisayara erişmek için statik bir rota tanımlanmış. Burada diyor ki; "176.236.170.162/32 makinasına gitmek istersen,
-# 192.168.1.34 arayüzünün üstünden 192.168.1.1 ağ geçidine yönlenmelisin".
+# Bu kez internet üstündeki bir bilgisayara erişmek için statik bir rota tanımlanmış. Burada diyor ki; "176.236.170.162/32 makinasına 
+# gitmek istersen, 192.168.1.34 arayüzünün üstünden 192.168.1.1 ağ geçidine yönlenmelisin".
   176.236.170.162  255.255.255.255      192.168.1.1     192.168.1.34     35
   
       192.168.1.0    255.255.255.0         On-link      192.168.1.34    291

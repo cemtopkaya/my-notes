@@ -156,3 +156,39 @@ Network Destination        Netmask          Gateway       Interface  Metric
   255.255.255.255  255.255.255.255         On-link      172.17.192.1    271
   255.255.255.255  255.255.255.255         On-link      172.21.112.1    271
 ```  
+
+Başka bir senaryoya bakalım:
+
+10.0.0.0/24 Ağında `10.0.0.10` IP'li bilgisayarımızdan `192.168.10.8` makinasına ICMP paketi gönderelim.
+Eğer statik rota tanımlıysa 192.168.10.8 IP adresinin hangi girdiyle bulunabileceğine bakacaktır.
+
+Örneğin A yönlendiricisinin rota tablosu şöyle olsun:
+```text
+C   F0/0                  10.0.0.0/24
+C   F0/1                  172.16.0.0/30
+S   192.168.10.0/24  via  172.16.0.2
+```
+
+ilk kayıt 10.0.0.0/24 bloğu olduğu için es geçecek, ikinci kayıt da öyle, 3. kayıtta 192.168.10.8 IP adresinin bloğunu bulacağı için hedef olarak ROUTER B'nin MAC adresini yazar ve yönlendirir. ROUTER B'ye gelen paket aynı şekilde rota tablosunda baklır.
+
+ROUTER B'nin rota tablosu şöyle olsun:
+```text
+C   F0/0                  172.16.0.0/30
+C   F0/1                  192.168.10.0/24
+```
+
+B Yönlendiricisi ikinci kayıtta 192.168.10.0 bloğunda hedef IP'nin olduğunu görüp üzerindeki F0/1 ethernet arayüzüne yönlendirir ancak bu kez BROADCAST MAC adresini hedef MAC alanına yazarak ARP mesajı yayınlayarak 192.168.10.8 IP'li bilgisayarın "benim ben" diye cevaplamasını isteyecek. Gelen MAC bilgisini FRAME HEADER'ına yazarak IP paketini (ICMP mesajı içeren) gönderecek.
+
+Ağdaki cihazların IP ve MAC adresleri:
+
+| İSTEMCİ      | ROUTER A             | ROUTER B              | SUNUCU        |
+| ------------ | -------------------- | --------------------- | ------------- |
+|              |  F0/0: 172.16.0.1/30 | F0/0: 172.16.0.2/30   |               | 
+|              |  AA:AA:00..          | BB:BB:00..            |               |
+| 10.0.0.10/24 |  F0/1: 10.0.0.0.1/24 | F0/1: 192.168.10.1/24 | 192.168.10.8  | 
+| 10:10:..     |  AA:AA:11..          | BB:BB:11..            | 88:88:..      |
+
+
+
+Peki, ya statik rota yoksa?
+İşte o zaman sürekli ARP paketleri yayarak hedefe götürecek HOP'ların MAC adreslerini toplayacak ve ortalık ARP mesajlarından geçilmeyecek.

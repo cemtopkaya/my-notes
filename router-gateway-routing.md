@@ -66,7 +66,7 @@ Network Destination        Netmask          Gateway       Interface  Metric
 # - ARP cevabındaki MAC adresini payload içinden çekerek (örneğin FA:EA:DA:CA olsun) ICMP mesajının Frame header'ına yazar,
 # - IP paketinde TTL'yi 1 azaltarak 127 yapar,
 # - ICMP mesajını içeren IP paketini hedefe gönderir,
-# - Gateway Network katmanındaki IP paketinin Header bilgisindeki kaynak IP adresini kendi adresiyle DEĞİŞMEZ!
+# - Gateway Network katmanındaki IP paketinin Header bilgisindeki kaynak ve hedef IP adreslerini bilinçli istemedikçe DEĞİŞMEZ!
 # - Böylece cevap mesajına yazılacak hedef IP adresi en baştaki 192.168.1.34 olarak tekrar yola çıkar
 #
 # Destination MAC    Source MAC         Layer3 Protocol    Payload

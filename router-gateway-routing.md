@@ -44,9 +44,33 @@ Network Destination        Netmask          Gateway       Interface  Metric
 # Destination MAC    Source MAC         Layer3 Protocol    Payload
 # D0-C6-37-C4-90-BE  CC:DE:12:F3:A1     ARP                CC:DE:12:F3:A1
 #
-# Gelen mesajın içinden 192.168.1.1 IP'li ADSL modemin MAC adresi alınıp ICMP paketinde DESTINATION MAC kısmına yazılır:
+# Gelen mesajın içinden 192.168.1.1 IP'li ADSL modemin MAC adresi alınıp ICMP paketinde DESTINATION MAC kısmına yazılır.
 # Destination MAC    Source MAC         Layer3 Protocol    Payload
 # CC:DE:12:F3:A1     D0-C6-37-C4-90-BE  IPv4               [192.168.1.34   85.86.87.88        128    Diğer bilgiler  ICMP]
+#
+# Paketi gönderdiğimiz ADSL modem, FRAME başlığını atarak IP paketinde yazılı hedef IP'ye (85.86.87.88) bakar.
+# Hedef adresin (85.86.87.88) kendi rota tablosunda hangi ağ arayüzü üstünden gönderilmesi gerektiğini çözümler.
+# Yeniden hedef makinanın MAC adresini çözümlemek için ARP paketi hazırlar:
+# - Frame header'ın Source MAC kısmına kendi MAC adresini yazar, 
+# - DESTINATION MAC için BROADCAST MAC adresini (FF:FF:FF:FF:FF) yazar,
+# - Layer3 Protokol olarak ARP yazar,
+# - ARP mesajının içeriğine "Who has 85.86.87.88?" yazar ve gönderir.
+#
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# FF:FF:FF:FF:FF     CC:DE:12:F3:A1     ARP                Who has 85.86.87.88?
+#
+# Gelen ARP REPLY içinden
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# CC:DE:12:F3:A1     FA:EA:DA:CA       ARP                 FA:EA:DA:CA
+#
+# - ARP cevabındaki MAC adresini payload içinden çekerek (örneğin FA:EA:DA:CA olsun) ICMP mesajının Frame header'ına yazar,
+# - IP paketinde TTL'yi 1 azaltarak 127 yapar
+# - ICMP mesajını içeren IP paketini hedefe gönderir.
+#
+# Destination MAC    Source MAC         Layer3 Protocol    Payload
+# FA:EA:DA:CA        CC:DE:12:F3:A1     IPv4               [192.168.1.34   85.86.87.88        127    Diğer bilgiler  ICMP]
+#
+# Gelen PING REPLY mesajlarını aynı yolla en baştaki bilgisayara ulaştırır.
 
           
        23.23.23.0    255.255.255.0         On-link       23.23.23.23    281

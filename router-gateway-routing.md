@@ -171,7 +171,7 @@ ROUTER A'ya gelen paketin hedef IP adresi 192.168.10.8, yönlendirme tablosunda 
 
 Burada bir açıklama daha yapalım. Eğer 10.0.0.10 makinamızın konsolundan ping mesajını 192.168.10.8'e atarsak ve `ROUTER A`'da tanımlı bir yönlendirme yoksa alacağımız cevap **`Destination host unreachable`** olacaktır
 
-```bash
+```batch
 C:\Windows\System32>ping 192.168.10.8
 Pinging 192.168.10.8 with 32 bytes of data:
 Reply from 10.0.0.1: Destination host unreachable. 

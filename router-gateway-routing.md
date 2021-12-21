@@ -8,7 +8,7 @@ Ağdaki cihazın dışarıya çıkmak için açtığı ilk kapı. Evden dışar�
 `route PRINT` komutunu konsolda yazdığımızda aşağıdaki gibi liste yazdırılacaktır. Bazı satırlarını hemen altına ayrıntılandıralım.
 Öncelikle bilgisayarım `192.168.1.34` IP adresine sahip ve ona bu adresi ADSL modemim (`192.168.1.1`) veriyor.
 
-```bash
+```console
 $ route PRINT
 ....
 IPv4 Route Table
@@ -171,7 +171,7 @@ ROUTER A'ya gelen paketin hedef IP adresi 192.168.10.8, yönlendirme tablosunda 
 
 Burada bir açıklama daha yapalım. Eğer 10.0.0.10 makinamızın konsolundan ping mesajını 192.168.10.8'e atarsak ve `ROUTER A`'da tanımlı bir yönlendirme yoksa alacağımız cevap **`Destination host unreachable`** olacaktır
 
-```bat
+```console
 C:\Windows\System32>ping 192.168.10.8
 Pinging 192.168.10.8 with 32 bytes of data:
 Reply from 10.0.0.1: Destination host unreachable. 
@@ -185,7 +185,7 @@ Ping statistics for 192.168.10.8:
 
 Ancak aşağıdaki adımda `192.168.10.x` bloğuna gitmek istenirse `ROUTER B`'ye gidilsin diye bir rotayı `ROUTER A`'ya tanımladığımızda alacağımız mesaj **`Request timed out.`** olacaktır. Çünkü bu kez `ROUTER A`'dan `ROUTER B`'ye bir hedef mevcut ancak `ROUTER B`'ye gelen cevabın hedefi `10.0.0.10` adresine yani bize olacağı için ve bu yönde (`192.160.10.x` -> `10.0.0.x` ) bir  rota tanımlı olmadığı için mesajlar `ROUTER B` tarafından düşürülür. `ROUTER A`'nın isteklerine karşılık gelecek cevap mesajları dönemediği için **İSTEK ZAMAN AŞIMINA** uğruyor.
 
-```bash
+```console
 C:\Windows\System32>ping 192.168.10.8
 Pinging 192.168.10.8 with 32 bytes of data: 
 Request timed out. 

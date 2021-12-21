@@ -186,6 +186,32 @@ Bu şekilde bir rota girdiğimizde tablomuza **SSSS**tatik rota eklemiş oluyoru
 
 ![image](https://user-images.githubusercontent.com/261946/146866667-e1d8c454-6a15-4c4e-926e-0d40fe2f4968.png)
 
+Rota bilgisi girerken kodlar ile rotanın türünü belirtiyoruz:
+| Kod | Anlamı |
+| --- | --- |
+| **C** | **connected** |
+| **S** | **static** |
+| R  | RIP |
+| M  | mobile |
+| B  | BGP |
+| D  | EIGRP |
+| EX | EIGRP external |
+| O  | OSPF |
+| IA | OSPF inter area |
+| N1 | OSPF NSSA external type 1 |
+| N2 | OSPF NSSA external type 2 |
+| E1 | OSPF external type 1 |
+| E2 | OSPF external type 2 
+| i  | IS-IS |
+| su | IS-IS summary |
+| L1 | IS-IS level-1 |
+| L2 | IS-IS level-2 |
+| ia | IS-IS inter area |
+| *  | candidate default |
+| U  | per-user static route |
+| o  | ODR |
+| P  | periodic downloaded static route |
+
 Şimdi tekrar akışı görelim:
 
 #### İstemci -> Router A
@@ -254,51 +280,19 @@ Artık paketler düşmeyecek !
 
 Sunucunun mesajı tekrar `ROUTER B`'ye gönderdiğini düşünelim ve akışa bir kez daha bakalım. Mesajı alan `ROUTER B` yönlendirme tablosunda `10.0.0.x` bloğuna gidecek kurala bakarak `172.16.0.1` IP adresine göndermesi gerektiğini görecek. O halde `172.16.0.1`'in MAC adresini öğrenmek için önce ARP mesajı gönderecek, gelen ARP REPLY içinden MAC adreini ICMP REPLY mesajının FRAME HEADER'ına yazarak gönderecek.
 
-![image](https://user-images.githubusercontent.com/261946/146872693-60dbc506-a76e-4f7b-8b10-31a6f449da16.png)
-
-
 ![image](https://user-images.githubusercontent.com/261946/146872463-4c8053f9-5217-467b-9513-2273f7a84bf3.png)
 
+---
 
+#### ROUTER A -> İstemci
 
+Artık mesaj `ROUTER A`'da. Tablosunda `10.0.0.x` bloğunun doğrudan (`On-link`) `F0/0` bacağına bağlı olduğunu görüp `10.0.0.10` makinasının MAC adresini öğrenmek için ARP  mesajını tüm ağa yayacak ve gelen mesaj bizim zavallı istemcimizden olacağı için onun MAC adresiyle paketin `FRAME HEADER`'ını süsleyerek gönderecek.
 
+![image](https://user-images.githubusercontent.com/261946/146873243-7193a32a-3ff0-467e-a242-c4900e3beb6a.png)
 
+Artık ICMP REPLY mesajı istemcide:
+![image](https://user-images.githubusercontent.com/261946/146873295-19b0aed6-9dc0-4884-a17c-c6768532e979.png)
 
+Sonuç olarak iki yönlendiricinin tablosuna birbirlerinin rota bilgilerini eklemiş olarak akışı sağlayabildik:
 
-
-#### TASLAK
-Başka bir senaryoya bakalım:
-
-10.0.0.0/24 Ağında `10.0.0.10` IP'li bilgisayarımızdan `192.168.10.8` makinasına ICMP paketi gönderelim.
-Eğer statik rota tanımlıysa 192.168.10.8 IP adresinin hangi girdiyle bulunabileceğine bakacaktır.
-
-Örneğin A yönlendiricisinin rota tablosu şöyle olsun:
-```text
-C   F0/0                  10.0.0.0/24
-C   F0/1                  172.16.0.0/30
-S   192.168.10.0/24  via  172.16.0.2
-```
-
-ilk kayıt 10.0.0.0/24 bloğu olduğu için es geçecek, ikinci kayıt da öyle, 3. kayıtta 192.168.10.8 IP adresinin bloğunu bulacağı için hedef olarak ROUTER B'nin MAC adresini yazar ve yönlendirir. ROUTER B'ye gelen paket aynı şekilde rota tablosunda baklır.
-
-ROUTER B'nin rota tablosu şöyle olsun:
-```text
-C   F0/0                  172.16.0.0/30
-C   F0/1                  192.168.10.0/24
-```
-
-B Yönlendiricisi ikinci kayıtta 192.168.10.0 bloğunda hedef IP'nin olduğunu görüp üzerindeki F0/1 ethernet arayüzüne yönlendirir ancak bu kez BROADCAST MAC adresini hedef MAC alanına yazarak ARP mesajı yayınlayarak 192.168.10.8 IP'li bilgisayarın "benim ben" diye cevaplamasını isteyecek. Gelen MAC bilgisini FRAME HEADER'ına yazarak IP paketini (ICMP mesajı içeren) gönderecek.
-
-Ağdaki cihazların IP ve MAC adresleri:
-
-| İSTEMCİ      | ROUTER A             | ROUTER B              | SUNUCU        |
-| ------------ | -------------------- | --------------------- | ------------- |
-|              |  F0/0: 172.16.0.1/30 | F0/0: 172.16.0.2/30   |               | 
-|              |  AA:AA:00..          | BB:BB:00..            |               |
-| 10.0.0.10/24 |  F0/1: 10.0.0.1/24   | F0/1: 192.168.10.1/24 | 192.168.10.8  | 
-| 10:10:..     |  AA:AA:11..          | BB:BB:11..            | 88:88:..      |
-
-
-
-Peki, ya statik rota yoksa?
-İşte o zaman sürekli ARP paketleri yayarak hedefe götürecek HOP'ların MAC adreslerini toplayacak ve ortalık ARP mesajlarından geçilmeyecek.
+![image](https://user-images.githubusercontent.com/261946/146873581-b1d3be04-b6e3-4571-96f6-caa0a9d642bd.png)

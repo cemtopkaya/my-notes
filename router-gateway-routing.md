@@ -157,6 +157,65 @@ Network Destination        Netmask          Gateway       Interface  Metric
   255.255.255.255  255.255.255.255         On-link      172.21.112.1    271
 ```  
 
+
+## Örnek 
+
+### Router Table üstünde yönlendirme yoksa paket düşer
+10.0.0.10'dan 192.168.10.8'e ICMP paketi gidecek. Paket hazırlanır ve 0.10 makinasının varsayılan ağ geçidine gönderilir.
+
+![image](https://user-images.githubusercontent.com/261946/146784291-0435baa0-6291-4f70-be77-b4e0d858d4d3.png)
+
+ROUTER A'ya gelen paketin hedef IP adresi 192.168.10.8, yönlendirme tablosunda aranır ve bulunamaz. Paket düşürülerek senaryo sonlanır!
+
+![image](https://user-images.githubusercontent.com/261946/146784852-b9568843-80b0-4577-a9b2-042fadaa0683.png)
+
+### Router A için 192.168.10.8'e gidilebilecek rota tanımlayalım
+
+![image](https://user-images.githubusercontent.com/261946/146785517-58c74647-1445-46bd-a7f8-09ea1a4654ba.png)
+
+A yönlendiricisi için diyoruz ki;
+> Sana 192.168.10.x IP'sine gitmek isteyen bir paket gelirse, B yönlendiricisinin MAC adresini frame başlığına yaz ve gönder, B yönlendiricisi nereye göndermesi gerekiyorsa o bilir.
+
+![image](https://user-images.githubusercontent.com/261946/146866223-b0cad6ca-5489-4af8-aee3-553a78772613.png)
+
+Bu şekilde bir rota girdiğimizde tablomuza *S*tatik rota eklemiş oluyoruz:
+
+![image](https://user-images.githubusercontent.com/261946/146866667-e1d8c454-6a15-4c4e-926e-0d40fe2f4968.png)
+
+Şimdi tekrar akışı görelim:
+
+İstemciden giden paketin IP başlığına kaynak ve hedef bilgilerini yazıp doğrudan varsayılan ağ geçidine göndereceğiz:
+
+![image](https://user-images.githubusercontent.com/261946/146866978-b4ed8052-50dc-4ee9-8adb-501b56d368aa.png)
+
+A Yönlendiricisine gelen paketin hedef IP adresine (192.168.10.8) uygun bir yönlendirme var mı diye bakılacak ve bulunacak (`S  192.168.10.0/24 via 172.16.0.2`). Artık gideceği hedef `Router B` olacağından onun MAC adresini öğrenmek için ARP paketi gönderilecek
+
+![image](https://user-images.githubusercontent.com/261946/146867459-fdfe63fa-8f24-44a5-813d-132406348b5f.png)
+![image](https://user-images.githubusercontent.com/261946/146867533-bc737046-56c3-49af-9efc-32235a14aa64.png)
+
+| DESTINATION MAC | SOURCE MAC | LAYER3 PROTOCOL | PAYLOAD |
+| --- | --- | --- | --- |
+|FF:FF:FF:FF:FF| AA:AA:AA:AA:AA | ARP | Who has 172.16.0.2? |
+
+ARP REPLY gelince içinden `ROUTER B`'nin MAC adresi FRAME içinde `DESTINATION MAC` kısmına yazılacak ve gönderilecek:
+
+![image](https://user-images.githubusercontent.com/261946/146867260-6790012e-9eec-4cc5-880b-1b856b3eec5d.png)
+
+---
+
+`ROUTER B` gelen paketin hedef IP adresini yönlendirme tablosunda `192.168.10.x` bloğuna gönderilebilir olarak bulur. FRAME Header'a yazacağı `DESTINATION MAC` bilgisine ne yazacağını bilemediği için ARP mesajına `Who has 192.168.10.8?` yazarak `DESTINATION MAC: FF:FF:FF:FF:FF` ile BROADCAST yapar. 
+Gelen cevaptan hedef makinanın MAC adresini alarak IPv4 Layer3 protokolüyle gidecek olan gerçek mesajın `DESTINATION MAC` bilgisini doldurarak hedefe ulaştırır.
+
+![image](https://user-images.githubusercontent.com/261946/146868914-e1333750-6305-49da-8928-659b23de1172.png)
+
+
+### Router Tablosunda yönlendirme bulunursa paket hedefe gider
+
+
+
+
+
+#### TASLAK
 Başka bir senaryoya bakalım:
 
 10.0.0.0/24 Ağında `10.0.0.10` IP'li bilgisayarımızdan `192.168.10.8` makinasına ICMP paketi gönderelim.

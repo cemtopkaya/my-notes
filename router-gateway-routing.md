@@ -163,11 +163,13 @@ Network Destination        Netmask          Gateway       Interface  Metric
 ### Router Table üstünde yönlendirme yoksa paket düşer
 10.0.0.10'dan 192.168.10.8'e ICMP paketi gidecek. Paket hazırlanır ve 0.10 makinasının varsayılan ağ geçidine gönderilir.
 
-![image](https://user-images.githubusercontent.com/261946/146784291-0435baa0-6291-4f70-be77-b4e0d858d4d3.png)
+![image](https://user-images.githubusercontent.com/261946/146869736-41869e8c-2242-4875-bda6-d9b0eb67ec20.png)
 
 ROUTER A'ya gelen paketin hedef IP adresi 192.168.10.8, yönlendirme tablosunda aranır ve bulunamaz. Paket düşürülerek senaryo sonlanır!
 
 ![image](https://user-images.githubusercontent.com/261946/146784852-b9568843-80b0-4577-a9b2-042fadaa0683.png)
+
+---
 
 ### Router A için 192.168.10.8'e gidilebilecek rota tanımlayalım
 
@@ -178,11 +180,13 @@ A yönlendiricisi için diyoruz ki;
 
 ![image](https://user-images.githubusercontent.com/261946/146866223-b0cad6ca-5489-4af8-aee3-553a78772613.png)
 
-Bu şekilde bir rota girdiğimizde tablomuza *S*tatik rota eklemiş oluyoruz:
+Bu şekilde bir rota girdiğimizde tablomuza **SSSS**tatik rota eklemiş oluyoruz:
 
 ![image](https://user-images.githubusercontent.com/261946/146866667-e1d8c454-6a15-4c4e-926e-0d40fe2f4968.png)
 
 Şimdi tekrar akışı görelim:
+
+#### İstemci -> Router A
 
 İstemciden giden paketin IP başlığına kaynak ve hedef bilgilerini yazıp doğrudan varsayılan ağ geçidine göndereceğiz:
 
@@ -195,9 +199,13 @@ A Yönlendiricisine gelen paketin hedef IP adresine (192.168.10.8) uygun bir yö
 
 | DESTINATION MAC | SOURCE MAC | LAYER3 PROTOCOL | PAYLOAD |
 | --- | --- | --- | --- |
-|FF:FF:FF:FF:FF| AA:AA:AA:AA:AA | ARP | Who has 172.16.0.2? |
+|FF:FF:FF:FF:FF| 0C:29:FC:70:A5 | ARP | Who has 172.16.0.2? |
 
-ARP REPLY gelince içinden `ROUTER B`'nin MAC adresi FRAME içinde `DESTINATION MAC` kısmına yazılacak ve gönderilecek:
+ARP REPLY gelince içinden `ROUTER B`'nin MAC adresi (diyelimki `BB:BB:BB:BB:BB:00` geldi) FRAME içinde `DESTINATION MAC` kısmına yazılacak ve gönderilecek:
+
+| DESTINATION MAC | SOURCE MAC | LAYER3 PROTOCOL | PAYLOAD |
+| --- | --- | --- | --- |
+| BB:BB:BB:BB:00 | 0C:29:FC:70:A5 | IPv4 | \[ IPv4 paketi: SRC IP:`10.0.0.10`, DST IP:`192.168.10.8`, TTL:`127`, OTHER, PROTOCOL: `ICMP` ] |
 
 ![image](https://user-images.githubusercontent.com/261946/146867260-6790012e-9eec-4cc5-880b-1b856b3eec5d.png)
 

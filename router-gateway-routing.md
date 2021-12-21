@@ -222,13 +222,42 @@ ARP REPLY gelince içinden `ROUTER B`'nin MAC adresi (diyelimki `BB:BB:BB:BB:BB:
 `ROUTER B` gelen paketin hedef IP adresini yönlendirme tablosunda `192.168.10.x` bloğuna gönderilebilir olarak bulur. FRAME Header'a yazacağı `DESTINATION MAC` bilgisine ne yazacağını bilemediği için ARP mesajına `Who has 192.168.10.8?` yazarak `DESTINATION MAC: FF:FF:FF:FF:FF` ile BROADCAST yapar. 
 Gelen cevaptan hedef makinanın MAC adresini alarak IPv4 Layer3 protokolüyle gidecek olan gerçek mesajın `DESTINATION MAC` bilgisini doldurarak hedefe ulaştırır.
 
-![image](https://user-images.githubusercontent.com/261946/146868914-e1333750-6305-49da-8928-659b23de1172.png)
+![image](https://user-images.githubusercontent.com/261946/146871068-65c67795-6c17-44fc-9df3-9400a3d19b97.png)
+
+![image](https://user-images.githubusercontent.com/261946/146871110-c1759e90-21d9-49e5-a1be-a8917407f391.png)
 
 ---
 
 ### SENARYO 3: Sunucudan cevabın ROUTER B'ye gönderilmesi
 
+#### Sunucu -> ROUTER B
+Sunucu gelen mesaja cevap olarak sıfırdan `ICMP REPLY` mesajı oluşturur ve TTL değerini `128` olarak yeniler. Gelen mesajın `FRAME HEADER`'ında yer alan `SOURCE MAC ADDRESS` değerini bu kez giden mesajın `DESTINATION MAC ADDRESS` kısmına yazar ve gönderir.
 
+![image](https://user-images.githubusercontent.com/261946/146871375-6f5d0e69-94c8-4f83-b4bf-d1750e834cdc.png)
+
+---
+
+#### ROUTER B -> Bitbucket
+
+Gelen mesajın hedef adresi `10.0.0.10` ve yönlendirme tablosunda olmadığı için paket düşürülür ve senaryo biter.
+
+![image](https://user-images.githubusercontent.com/261946/146871464-e0be3cc8-79e3-4052-87cf-a748e53311a3.png)
+
+---
+
+#### ROUTER B'ye 10.0.0.x bloğuna gidecek paketler için ROTA EKLEYELİM
+
+`ROUTER B`'nin `F0/0` bacağından `ROUTER A`'nın `F0/1` bacağına hedef IP bloğu `10.0.0.x` için `S 10.0.0.0/24 via 172.16.0.1` rotasını `ROUTER B`'nin tablosuna ekliyoruz.
+Artık paketler düşmeyecek !
+
+![image](https://user-images.githubusercontent.com/261946/146871912-06ed1a6c-9663-41ba-8945-bdade0464c9f.png)
+
+Sunucunun mesajı tekrar `ROUTER B`'ye gönderdiğini düşünelim ve akışa bir kez daha bakalım. Mesajı alan `ROUTER B` yönlendirme tablosunda `10.0.0.x` bloğuna gidecek kurala bakarak `172.16.0.1` IP adresine göndermesi gerektiğini görecek. O halde `172.16.0.1`'in MAC adresini öğrenmek için önce ARP mesajı gönderecek, gelen ARP REPLY içinden MAC adreini ICMP REPLY mesajının FRAME HEADER'ına yazarak gönderecek.
+
+![image](https://user-images.githubusercontent.com/261946/146872693-60dbc506-a76e-4f7b-8b10-31a6f449da16.png)
+
+
+![image](https://user-images.githubusercontent.com/261946/146872463-4c8053f9-5217-467b-9513-2273f7a84bf3.png)
 
 
 

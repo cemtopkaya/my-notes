@@ -160,7 +160,7 @@ Network Destination        Netmask          Gateway       Interface  Metric
 
 ## Örnek 
 
-### Router Table üstünde yönlendirme yoksa paket düşer
+### SENARYO 1: Router Table üstünde yönlendirme yoksa paket düşer
 10.0.0.10'dan 192.168.10.8'e ICMP paketi gidecek. Paket hazırlanır ve 0.10 makinasının varsayılan ağ geçidine gönderilir.
 
 ![image](https://user-images.githubusercontent.com/261946/146869736-41869e8c-2242-4875-bda6-d9b0eb67ec20.png)
@@ -171,7 +171,9 @@ ROUTER A'ya gelen paketin hedef IP adresi 192.168.10.8, yönlendirme tablosunda 
 
 ---
 
-### Router A için 192.168.10.8'e gidilebilecek rota tanımlayalım
+### SENARYO 2: Router Tablosunda yönlendirme bulunursa paket hedefe gider
+
+#### Router A için 192.168.10.8'e gidilebilecek rota tanımlayalım
 
 ![image](https://user-images.githubusercontent.com/261946/146785517-58c74647-1445-46bd-a7f8-09ea1a4654ba.png)
 
@@ -192,6 +194,10 @@ Bu şekilde bir rota girdiğimizde tablomuza **SSSS**tatik rota eklemiş oluyoru
 
 ![image](https://user-images.githubusercontent.com/261946/146866978-b4ed8052-50dc-4ee9-8adb-501b56d368aa.png)
 
+---
+
+#### Router A -> Router B
+
 A Yönlendiricisine gelen paketin hedef IP adresine (192.168.10.8) uygun bir yönlendirme var mı diye bakılacak ve bulunacak (`S  192.168.10.0/24 via 172.16.0.2`). Artık gideceği hedef `Router B` olacağından onun MAC adresini öğrenmek için ARP paketi gönderilecek
 
 ![image](https://user-images.githubusercontent.com/261946/146867459-fdfe63fa-8f24-44a5-813d-132406348b5f.png)
@@ -211,13 +217,21 @@ ARP REPLY gelince içinden `ROUTER B`'nin MAC adresi (diyelimki `BB:BB:BB:BB:BB:
 
 ---
 
+#### Router B -> Sunucu
+
 `ROUTER B` gelen paketin hedef IP adresini yönlendirme tablosunda `192.168.10.x` bloğuna gönderilebilir olarak bulur. FRAME Header'a yazacağı `DESTINATION MAC` bilgisine ne yazacağını bilemediği için ARP mesajına `Who has 192.168.10.8?` yazarak `DESTINATION MAC: FF:FF:FF:FF:FF` ile BROADCAST yapar. 
 Gelen cevaptan hedef makinanın MAC adresini alarak IPv4 Layer3 protokolüyle gidecek olan gerçek mesajın `DESTINATION MAC` bilgisini doldurarak hedefe ulaştırır.
 
 ![image](https://user-images.githubusercontent.com/261946/146868914-e1333750-6305-49da-8928-659b23de1172.png)
 
+---
 
-### Router Tablosunda yönlendirme bulunursa paket hedefe gider
+### SENARYO 3: Sunucudan cevabın ROUTER B'ye gönderilmesi
+
+
+
+
+
 
 
 

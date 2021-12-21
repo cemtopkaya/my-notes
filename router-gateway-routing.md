@@ -169,6 +169,37 @@ ROUTER A'ya gelen paketin hedef IP adresi 192.168.10.8, yönlendirme tablosunda 
 
 ![image](https://user-images.githubusercontent.com/261946/146784852-b9568843-80b0-4577-a9b2-042fadaa0683.png)
 
+Burada bir açıklama daha yapalım. Eğer 10.0.0.10 makinamızın konsolundan ping mesajını 192.168.10.8'e atarsak ve `ROUTER A`'da tanımlı bir yönlendirme yoksa alacağımız cevap **`Destination host unreachable`** olacaktır
+
+```bash
+C:\Windows\System32>ping 192.168.10.8
+Pinging 192.168.10.8 with 32 bytes of data:
+Reply from 10.0.0.1: Destination host unreachable. 
+Reply from 10.0.0.1: Destination host unreachable. 
+Reply from 10.0.0.1: Destination host unreachable. 
+Reply from 10.0.0.1: Destination host unreachable.
+
+Ping statistics for 192.168.10.8:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+```
+
+Ancak aşağıdaki adımda `192.168.10.x` bloğuna gitmek istenirse `ROUTER B`'ye gidilsin diye bir rotayı `ROUTER A`'ya tanımladığımızda alacağımız mesaj **`Request timed out.`** olacaktır. Çünkü bu kez `ROUTER A`'dan `ROUTER B`'ye bir hedef mevcut ancak `ROUTER B`'ye gelen cevabın hedefi `10.0.0.10` adresine yani bize olacağı için ve bu yönde (`192.160.10.x` -> `10.0.0.x` ) bir  rota tanımlı olmadığı için mesajlar `ROUTER B` tarafından düşürülür. `ROUTER A`'nın isteklerine karşılık gelecek cevap mesajları dönemediği için **İSTEK ZAMAN AŞIMINA** uğruyor.
+
+```bash
+C:\Windows\System32>ping 192.168.10.8
+Pinging 192.168.10.8 with 32 bytes of data: 
+Request timed out. 
+Request timed out. 
+Request timed out. 
+Request timed out.
+
+Ping statistics for 192.168.10.8:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),
+    
+C:\Windows\System32>
+```
+
+
 ---
 
 ### SENARYO 2: Router Tablosunda yönlendirme bulunursa paket hedefe gider

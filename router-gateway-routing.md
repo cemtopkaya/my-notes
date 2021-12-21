@@ -327,3 +327,9 @@ Artık ICMP REPLY mesajı istemcide:
 Sonuç olarak iki yönlendiricinin tablosuna birbirlerinin rota bilgilerini eklemiş olarak akışı sağlayabildik:
 
 ![image](https://user-images.githubusercontent.com/261946/146873581-b1d3be04-b6e3-4571-96f6-caa0a9d642bd.png)
+
+ 10.0.0.x bloğu için `Router B`'ye statik route eklerken hem 172.16.0.2 adresinin olduğu interface üstünden diyebildiğimiz gibi hem de `F0/0`'a (aygıta) yönlendir diyebiliriz:
+ ```shell
+ $ ip route 10.0.0.0  255.255.255.0 f0/0
+ $ ip route 10.0.0.0 172.16.0.2
+ ```

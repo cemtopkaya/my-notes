@@ -15,3 +15,4 @@
   - Simplex
   - Half Duplex
   - Full Duplex
+- [Ağ Ad Alanları - IPVlan](https://github.com/cemtopkaya/my-notes/blob/main/IPVlan.md)

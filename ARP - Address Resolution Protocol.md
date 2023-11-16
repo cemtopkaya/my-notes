@@ -48,6 +48,17 @@ Listenin üçüncü elemanı ise Microsoft'un IGMP (Internet Group Messaging Pro
   224.0.0.22            01-00-5e-00-00-16     static
 ```
 
+**`224.0.0.22`:** Bu, IP adresi genellikle çoklu yayın (multicast) adresi olarak kullanılır. 
+
+> Multicast adresleri, belirli bir grup cihaza yönlendirilen paketleri temsil eder. IPv4 adres aralıkları içinde belirli bir segment multi-cast kullanımına ayrılmıştır. 224.0.0.0 ila 239.255.255.255 aralığı, multi-cast adreslerini içerir. Bu adresler, belirli gruplar için aynı anda birden çok alıcıya yönlendirilen verileri temsil eder.
+> 224.0.0.22 IP adresi, Internet Assigned Numbers Authority (IANA) tarafından "Internet Group Management Protocol (IGMP) ve Multicast Listener Discovery (MLD) Protocols" için ayrılmış bir adresidir. Bu adres, bu protokoller tarafından kullanılır ve genellikle router'lar ve cihazlar arasında multi-cast grup üyelikleri yönetiminde kullanılır.
+> Bir cihazın bir multi-cast adresine üye olması, bu grup tarafından gönderilen verileri almasını sağlar. Multi-cast, özellikle video akışı, ses yayını ve diğer benzer uygulamalarda çok sayıda alıcının aynı anda veriyi alması gerektiği durumlar için etkilidir.
+
+**`01-00-5e-00-00-16`:** Bu, IP adresiyle ilişkilendirilmiş olan fiziksel (MAC) adresi ifade eder. Yani, `224.0.0.22` IP adresine sahip cihazın bu MAC adresine sahip olduğunu belirtir.
+
+**`static`:** Bu, ARP önbellek girişinin elle (statik olarak) yapılandırıldığını gösterir. Yani, bu çözümleme girişi elle eklenmiş ve değiştirilmemiş bir giriştir.
+
+
 Diğer multicast adreslerimizden [224.0.0.251 - Multicast DNS](https://www.rfc-editor.org/rfc/rfc6762.html), [224.0.0.251 - Link-Local Multicast Name Resolution (LLMNR)](https://www.rfc-editor.org/rfc/rfc4795.html) 
 ``` bash
   224.0.0.251           01-00-5e-00-00-fb     static

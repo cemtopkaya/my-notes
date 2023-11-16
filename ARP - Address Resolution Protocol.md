@@ -4,7 +4,11 @@ IP Adresi -> MAC Adresi
 
 ![image](https://user-images.githubusercontent.com/261946/146691943-60ec9f9d-b6ab-4cf1-a734-ff6fa7371f79.png)
 
-**Data Link** katmanıyla, **Network Link** katmanı arasında çalışır ARP mesajları. Kaynak ve hedefin IP adreslerini ağ katmanında yazılırken, MAC adresi veri katmanında yazılır. Eğer IP'nin karşılığı olan MAC adresi bilinmiyorsa `FF:FF:FF:FF:FF:FF` adresi yazılır ve bu sayede ağdaki tüm bilgisayarlara "`10.10.12.121` IP'li hedef adres sen isen bana MAC adresini ARP protokolüyle gönderdiğim bu isteği cevaplayarak bildir" deriz.
+**Data Link** katmanıyla, **Network Link** katmanı arasında çalışır ARP mesajları. 
+
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/455bee22-7b35-488a-a25e-a35f41f8e49e)
+
+Kaynak ve hedefin IP adreslerini ağ katmanında yazılırken, MAC adresi veri katmanında yazılır. Eğer IP'nin karşılığı olan MAC adresi bilinmiyorsa `FF:FF:FF:FF:FF:FF` adresi yazılır ve bu sayede ağdaki tüm bilgisayarlara "`10.10.12.121` IP'li hedef adres sen isen bana MAC adresini ARP protokolüyle gönderdiğim bu isteği cevaplayarak bildir" deriz.
 
 ARP isteği ile IP Adresinin MAC adresine çözümlemesi yapılır. Aşağıdaki istek çıktısı ve cevabında hedef IP'nin MAC adresi bilinmezken (00:00:00:00:00:00) gelen cevabın içeriğinde MAC bilgisini görebiliyoruz (00:09:0f:0c:57:d2)
 

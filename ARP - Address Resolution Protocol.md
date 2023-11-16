@@ -24,7 +24,8 @@ O halde kapımızın ARP tablosuna `# arp -a | grep 192.168.1.34 -A9 -B1` komutu
 
 ![image](https://user-images.githubusercontent.com/261946/146694933-95229653-38ee-415a-8c5f-b4bd31d9f205.png)
 
-Kablosuz ağımızın GATEWAY'i yani ADSL modemimiz bizim ARP mesajlarımıza cevap verenlerden olduğu için **LAYER 2 broadcast mesajlarımızı (`FF:FF:FF:FF:FF:FF`)** kabul ettiği için listenin en üstüne yazıyoruz.
+Kablosuz ağ kartımızın GATEWAY adresine ADSL modemimizin IP adresini yazılmış (192.168.1.1) çünkü bize IP adresini de ADSL modemimiz vermiş :)
+Demek ki biz MAC adresini bilmediğimiz bir IP adresine ulaşacaksak önce **yayın (BROADCAST)** yapmamız gerekiyor. Bu yayını 192.168.1.255 üzerinden ve aradığımız bilgisayarın MAC adresini boş (`FF:FF:FF:FF:FF:FF`) ancak IP adresini dolu şekilde ARP mesajlarını LAYER 2 broadcast üzerinden yaymalıyız. 
 
 ```bash
   Internet Address      Physical Address      Type

@@ -24,8 +24,14 @@ O halde kapımızın ARP tablosuna `# arp -a | grep 192.168.1.34 -A9 -B1` komutu
 
 ![image](https://user-images.githubusercontent.com/261946/146694933-95229653-38ee-415a-8c5f-b4bd31d9f205.png)
 
+> **192.168.1.255 (IPv4):** Bu bir yayın adresidir ve IPv4 tabanlı yerel ağlarda `192.168.1.0/24` subnetindeki tüm cihazlara yayın yapmak istediğinizde, bu IP adresini kullanırsınız. Örneğin, bir cihaz bir ağdaki diğer cihazlara bir mesaj göndermek istediğinde, bu yayın adresini kullanarak ağdaki tüm cihazlara ulaşabilir.
+
+> **FF:FF:FF:FF:FF:FF (MAC Address):** Ethernet ağlarında kullanılan ve yayın (broadcast) trafiğini temsil eden bir MAC (Media Access Control) adresidir. Ethernet çerçevesini bütün ağa iletmek için kullanılır. Bir cihaz, bu MAC adresini hedeflediğinde, bu çerçeve ağdaki tüm cihazlara gönderilir. Yani, belirli bir hedef adresi olmayan ve ağdaki tüm cihazlara ulaşmak isteyen bir cihaz, bu yayın MAC adresini kullanabilir.
+
 Kablosuz ağ kartımızın GATEWAY adresine ADSL modemimizin IP adresini yazılmış (192.168.1.1) çünkü bize IP adresini de ADSL modemimiz vermiş :)
-Demek ki biz MAC adresini bilmediğimiz bir IP adresine ulaşacaksak önce **yayın (BROADCAST)** yapmamız gerekiyor. Bu yayını 192.168.1.255 üzerinden ve aradığımız bilgisayarın MAC adresini boş (`FF:FF:FF:FF:FF:FF`) ancak IP adresini dolu şekilde ARP mesajlarını LAYER 2 broadcast üzerinden yaymalıyız. 
+Demek ki biz MAC adresini bilmediğimiz bir IP adresine ulaşacaksak önce **yayın (BROADCAST)** yapmamız gerekiyor. Bu yayını 192.168.1.255 üzerinden ve aradığımız bilgisayarın MAC adresini boş (`FF:FF:FF:FF:FF:FF`) ancak IP adresini dolu şekilde ARP mesajlarını LAYER 2 broadcast adresi üzerinden (`FF:FF:FF:FF:FF:FF`) yayarız.
+
+> Katman 2'nin ethernet yayın adresi (Ethernet broadcast address) nedir?
 
 ```bash
   Internet Address      Physical Address      Type

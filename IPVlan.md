@@ -1,8 +1,4 @@
 
-
-
-
-
 # IPVlan 
 
 Önce IPVlan nedir, ne işe yarar öğrenelim.
@@ -48,7 +44,116 @@ Aşağıdaki komut satırı çıktılarını tek tek inceleyerek örneğimize ba
 ![image](https://github.com/cemtopkaya/my-notes/assets/261946/fe7b4165-17ae-423d-be19-ce6cc452531b)
 
 #### 5. ipvlan Sürücüsünü Kullanan Docker Ağı Yaratılıyor
+Ipvlan, iki ana mod ile kullanılabilir: Layer 2 (L2) mode ve Layer 3 (L3) mode. Bu modlar, konteynerlerin host üzerinde nasıl göründüğünü ve nasıl ağ trafiği yönlendirildiğini belirler.
 
+Önce `bridge` sürücülü varsayılan docker ağına bağlanarak oluşturulan bir konteynerin kendine özgü bir MAC adresiyle yaratıldığını görelim:
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/9449153c-509f-4639-ae8f-79dded4eea20)
+
+Aynı konteyner oluşturma işini peş peşe 3 kez tekrar edince sırayla her konteyner için özgün bir MAC adresi oluşturulduğunu göreceksiniz:
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/9f0ebaff-3c22-4615-a093-bb6a5cc49be7)
+
+Peki şimdi bu konteynerleri, ev sahibi bilgisayarın `eth0` ağ kartını `parent` alacak şekilde yaratacağımız bir `ipvlan` ağına bağlayarak oluşturalım:
+
+- önce ipvlan sürücüsünü kullanan kendi IP bloğu olan bir ağ yaratalım
+- sonra konteyneri bu ağa bağlanacak şekilde `--network <ağ adı>` bayrağıyla oluşturalım 
+
+```bash
+$ docker network create              \
+            --driver ipvlan          \
+            --subnet=10.20.20.0/24   \
+            --gateway=10.20.20.1     \
+            --opt mode=l2     \
+            --opt parent=eth0 \
+            yeni_ag_l2
+
+$ docker run -d --network yeni_ag_l2 nicolaka/netshoot sleep 100
+```
+`Layer 2` Modunda bir ağ yarattık (`ipvlan_mode=l2`) ve parent olarak fiziki ağ kartını (`eth0`) gösterdik (`ipvlan_parent=eth0`). Konteyneri bu ağa bağlayacak şekilde oluşturduk ve konteynerin kendine ait özgün bir MAC adresi oluştuğunu gördük çünkü Data Layer (layer 2) hedeflenmişti.
+
+```bash
+$ docker network create --driver ipvlan --subnet=10.20.20.0/24 --gateway=10.20.20.1 --opt mode=l2 --opt parent=eth0 yeni_ag_l2
+48af008b33df7b820cd32ec7b0d8a3e152cc43cc691319d77f429732bdf156bc
+
+$ docker run -d --network yeni_ag_l2 nicolaka/netshoot sleep 100
+95fa3045a843f91442ac5edffaf85553ad960d8776fab202c22aecbe3790c021
+
+$ docker exec -it 95 ip -br -c -a link
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
+eth0@if2         UNKNOWN        00:15:5d:10:e0:5c <BROADCAST,MULTICAST,UP,LOWER_UP>
+
+$ ip -br -c -a link
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
+eth0             UP             00:15:5d:10:e0:5c <BROADCAST,MULTICAST,UP,LOWER_UP>
+docker0          DOWN           02:42:26:85:a7:a0 <NO-CARRIER,BROADCAST,MULTICAST,UP>
+
+$ docker inspect -f '{{json .}}' yeni_ag_l2 | jq '{name: .Name, driver: .Driver, containers: .Containers}'
+{
+  "name": "yeni_ag_l2",
+  "driver": "ipvlan",
+  "containers": {
+    "95fa3045a843f91442ac5edffaf85553ad960d8776fab202c22aecbe3790c021": {
+      "Name": "elated_carver",
+      "EndpointID": "a8e91f3dd5299829bbe846cd6119c09f415cafdc1cf9da03b85768536fe20fc3",
+      "MacAddress": "",
+      "IPv4Address": "10.20.20.2/24",
+      "IPv6Address": ""
+    }
+  }
+}
+```
+
+Şimdi Layer 3 modunda bir ağ ve bu ağa bağlı konteyner yaratalım:
+```bash
+$ docker network ls && echo ----- && docker ps && echo ----- && ip -br -c -a addr && echo ---- && ip -br -c link
+NETWORK ID     NAME      DRIVER    SCOPE
+fbd2ddef8aa6   bridge    bridge    local
+74a450fd2704   host      host      local
+5fd49e26190c   none      null      local
+-----
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+-----
+lo               UNKNOWN        127.0.0.1/8 ::1/128
+eth0             UP             172.18.108.207/20 fe80::215:5dff:fe10:e05c/64
+docker0          DOWN           172.17.0.1/16 fe80::42:26ff:fe85:a7a0/64
+----
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
+eth0             UP             00:15:5d:10:e0:5c <BROADCAST,MULTICAST,UP,LOWER_UP>
+docker0          DOWN           02:42:26:85:a7:a0 <NO-CARRIER,BROADCAST,MULTICAST,UP>
+cemt@PC-CEM-TOPKAYA:~$
+cemt@PC-CEM-TOPKAYA:~$ docker network create --driver ipvlan --subnet=10.30.30.0/24 --gateway=10.30.30.1 --opt mode=l3 --opt parent=eth0 yeni_ag_l3
+f094d8abeb8cd5cdd94307441588ebf7e253bfc80771db66820dafa16dec0ccc
+cemt@PC-CEM-TOPKAYA:~$
+cemt@PC-CEM-TOPKAYA:~$ docker run -d --network yeni_ag_l3 nicolaka/netshoot sleep 100
+0531c0be4cf66b5c3aa74e8091c8a2b5c2969de1b99133a2109ebf1b32989d05
+cemt@PC-CEM-TOPKAYA:~$
+cemt@PC-CEM-TOPKAYA:~$ docker exec -it 05 ip -br -c -a link
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
+eth0@if2         UNKNOWN        00:15:5d:10:e0:5c <BROADCAST,MULTICAST,UP,LOWER_UP>
+cemt@PC-CEM-TOPKAYA:~$
+cemt@PC-CEM-TOPKAYA:~$ docker exec -it 05 ip -br -c -a addr
+lo               UNKNOWN        127.0.0.1/8
+eth0@if2         UNKNOWN        10.30.30.2/24
+
+```
+
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/c2cde0b7-6fea-4e52-a34e-75af77a35d4d)
+
+
+```bash
+$ docker inspect -f '{{json .}}' bridge | jq '{name: .Name, driver: .Driver, containers: .Containers}'
+```
+
+1. **Layer 2 (L2) Mode:**
+   - **Açıklama:** Layer 2 modu, her bir konteynerin kendine özgü bir MAC (Media Access Control) adresi ile aynı fiziki ağda bulunan diğer cihazlar gibi davranmasını sağlar. Bu modda, konteynerlerin host'a doğrudan bağlı gibi davranmaları söz konusudur.
+   - **Kullanım:** `--ipvlan_mode=l2` veya `-o ipvlan_mode=l2` seçeneği ile belirlenir.
+
+2. **Layer 3 (L3) Mode:**
+   - **Açıklama:** Layer 3 modu, konteynerlerin host'un IP adresi kullanılarak iletişim kurmalarını sağlar, ancak host üzerindeki ağ trafiği hala Layer 2 üzerinden yönlendirilir. Bu modda, konteynerlerin host'un IP adresi ile aynı alt ağda olmaları önemlidir.
+   - **Kullanım:** `--ipvlan_mode=l3` veya `-o ipvlan_mode=l3` seçeneği ile belirlenir.
+
+Bu modlar, konteynerlerin ağdaki diğer cihazlarla nasıl etkileşimde bulunacağını belirler. L2 modu genellikle konteynerlerin daha geniş bir ağda yer almasını ve ağdaki diğer cihazlarla doğrudan iletişim kurmalarını sağlamak için kullanılırken, L3 modu genellikle host'un IP adresi üzerinden iletişim kurmalarını sağlamak için kullanılır.
+Bir `ipvl
+an` sürücüsünde ağ yaratacaksanız iki modda çalışlıyor `l2`, `l3`
 ```bash
 docker network create --driver ipvlan  --opt mode=l2 --opt parent=eth0 ipvlan_network
 ```

@@ -1,6 +1,69 @@
+
+
+
+
+
 # IPVlan 
 
+Önce IPVlan nedir, ne işe yarar öğrenelim.
+Tabii ki, ipvlan (IP Virtual LAN), Docker'ın desteklediği bir ağ modudur ve Linux kernel'inin özelliklerini kullanarak konteynerlere özgü IP adreslerine sahip olmalarını sağlar. Ipvlan, birden çok IP adresine sahip bir ağ arabirimini oluşturur ve her bir IP adresi bir konteynerle ilişkilendirilebilir.
 
+İşte ipvlan ile ilgili bazı temel kavramlar:
+
+1. **Ipvlan Modları:**
+   - **L2 Mode (Layer 2 Mode):** Konteynerler, host'a doğrudan bağlı gibi davranır, aynı fiziksel ağda bulunan diğer cihazlarla aynı Layer 2 ağında gibi iletişim kurabilirler.
+   - **L3 Mode (Layer 3 Mode):** Konteynerler, host'un IP adresi kullanılarak iletişim kurarlar, ancak host üzerindeki ağ trafiği hala Layer 2 üzerinden yönlendirilir.
+
+2. **Konteynerlerin Kendi IP Adresine Sahip Olması:**
+   - Ipvlan, her bir konteynerin kendi IP adresine sahip olmasını sağlar. Bu, konteynerlerin host ağındaki diğer cihazlarla daha doğrudan iletişim kurmalarına olanak tanır.
+
+3. **Performans ve İzolasyon:**
+   - Ipvlan, host üzerindeki Linux kernel özelliklerini kullanarak çalıştığından, performans açısından etkili bir çözümdür. Ayrıca, konteynerler arasında izolasyon sağlar.
+
+4. **Docker Ipvlan Kullanımı:**
+   - Ipvlan modunu kullanmak için bir Docker konteyneri oluştururken `--network ipvlan` seçeneğini kullanabilirsiniz. 
+
+Örneğin:
+Aşağıdaki komut satırı çıktılarını tek tek inceleyerek örneğimize başlayalım.
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/19419a26-27aa-471d-92ae-db966e55f206)
+
+#### 1. Ağ Kartlarının 1-2 Katmanlarındaki Bilgileri
+`$ ip -a -br -c l` komutuyla ev sahibi bilgisayarın ağ kartları hakkında `Layer 1` (fiziki katman, elektrik sinyalleri seviyesi) ve `Layer  2` (Veri -Data- katmanında MAC adresi yer alır) seviyelerinde bilgileri çekebiliriz.
+
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/7d75b31e-0ade-413d-a7a4-4749accd482d)
+
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/5c2aa20d-7c16-4112-a3d6-b617851e370a)
+
+#### 2. Docker Ağları
+`$ docker network ls` komutuyla varsayılan ağları görüyoruz ( `none`, `bridge`, `host` ). Buraya bizim tanımlayacağımız `ipvlan` türünde bir ağ tanımı birazdan gelecek. Burada eklenmişi var :))) sırf fikir olsun diye son halini de görün:
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/4a9ec144-d659-4ddd-8194-5e3f91848e39)
+
+#### 3. Docker Konteynerleri
+`$ docker ps` komutuyla çalışan konteynerlerin olmadığını görüyoruz.
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/ad6c7626-e3a8-487c-be80-a6b634f116d1)
+
+
+#### 4.  Ağ Kartlarının 3. Katmanındaki Bilgileri
+`$ ip -a -br -c a` komutuyla ev sahibi bilgisayarın ağ kartlarının  `Layer 3` ağ (network) katmanı seviyelesinde bilgileri çekebiliriz.
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/fe7b4165-17ae-423d-be19-ce6cc452531b)
+
+#### 5. ipvlan Sürücüsünü Kullanan Docker Ağı Yaratılıyor
+
+```bash
+docker network create --driver ipvlan  --opt mode=l2 --opt parent=eth0 ipvlan_network
+```
+ 
+![image](https://github.com/cemtopkaya/my-notes/assets/261946/26ca13c9-bd97-431f-9999-b019638b40f5)
+
+```bash
+docker run --network ipvlan --ip 192.168.1.2 -it ubuntu /bin/bash
+```
+
+     Bu komut, bir Ubuntu konteynerini ipvlan ağına bağlar ve konteynerin IP adresini belirler.
+
+Ipvlan, özellikle her bir konteynerin kendi IP adresine sahip olması gerektiği durumlar için kullanışlıdır. Ancak, ipvlan modunu kullanmadan önce ağ yapılandırmanızı dikkatlice planlamanız önemlidir.
+
+---
 
 Kernel'e eklenmesiyle ilgili [IPVLAN Driver HOWTO](https://www.kernel.org/doc/Documentation/networking/ipvlan.txt).
 L3 ve L2 de çalışabilen bir sürücü. L3 te Broadcast ve Multicast özelliklerini yitiriyor.
